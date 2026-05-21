@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { Ic } from "../components/Icons";
 import { AgencyLogo } from "../components/AgencyLogo";
 import { AGENCIES } from "../data/agencies";
-import { Conversation } from "../data/conversations";
-import { sendChatMessage } from "../services/chatService";
+import { Conversation, ChatMessage } from "../data/conversations";
+import { sendChatMessage, subscribeToConversation, unsubscribeFromConversation, loadMessagesFromDB } from "../services/chatService";
+import { supabase } from "../lib/supabase";
 
 interface Props {
   t: any;
@@ -23,11 +24,73 @@ export function MessagesPage({
 }: Props) {
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
+  const [connected, setConnected] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const msgs = t.msgs;
 
   const activeConv = convs.find(c => c.id === activeC);
   const agency = activeConv ? AGENCIES.find(a => a.id === activeConv.agencyId) : null;
+
+  // ── Real-time subscription when active conversation changes ─────────────────
+  useEffect(() => {
+    if (!activeConv || !currentUser) return;
+
+    const convDbId = `conv_${currentUser.id}_ag${activeConv.agencyId}`;
+
+    // Load existing messages from Supabase
+    loadMessagesFromDB(convDbId).then(dbMsgs => {
+      if (dbMsgs.length > 0) {
+        setConvs(p => p.map(c =>
+          c.id === activeC ? { ...c, msgs: dbMsgs } : c
+        ));
+      }
+    });
+
+    // Subscribe to real-time new messages
+    const channel = supabase
+      .channel(`messages-${convDbId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${convDbId}`,
+        },
+        (payload) => {
+          const row = payload.new as any;
+          // Ignore our own messages (already added optimistically)
+          if (row.sender === "user" && row.user_id === currentUser.id) return;
+
+          const incomingMsg: ChatMessage = {
+            id: row.id,
+            from: row.sender as "user" | "agency",
+            text: row.text,
+            time: new Date(row.created_at).toLocaleTimeString("fr-DZ", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            status: "delivered",
+          };
+
+          setTyping(false);
+          setConvs(p => p.map(c =>
+            c.id === activeC
+              ? { ...c, msgs: [...c.msgs, incomingMsg] }
+              : c
+          ));
+        }
+      )
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "messages", filter: `conversation_id=eq.${convDbId}` }, () => {})
+      .subscribe((status) => {
+        setConnected(status === "SUBSCRIBED");
+      });
+
+    return () => {
+      channel.unsubscribe();
+      setConnected(false);
+    };
+  }, [activeC, currentUser?.id]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -35,7 +98,16 @@ export function MessagesPage({
 
   const send = () => {
     if (!input.trim() || !activeC) return;
-    sendChatMessage(activeC, input.trim(), null, lang, setConvs, setTyping);
+    sendChatMessage(
+      activeC,
+      input.trim(),
+      null,
+      lang,
+      setConvs,
+      setTyping,
+      currentUser?.id,
+      activeConv?.agencyId
+    );
     setInput("");
   };
 
@@ -84,10 +156,11 @@ export function MessagesPage({
             {/* Chat header */}
             <div style={{ padding: "13px 18px", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", gap: 11, background: "rgba(255,255,255,.03)" }}>
               <AgencyLogo agency={agency} size={38} />
-              <div>
+              <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{lang === "ar" ? agency.ar : agency.fr}</div>
-                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#34D399" }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#34D399", animation: "pulse 2s infinite", display: "inline-block" }} />{msgs.online}
+                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: connected ? "#34D399" : "#FBBF24" }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: connected ? "#34D399" : "#FBBF24", animation: connected ? "pulse 2s infinite" : "none", display: "inline-block" }} />
+                  {connected ? msgs.online : (lang === "ar" ? "جارِ الاتصال..." : "Connexion...")}
                 </div>
               </div>
             </div>
