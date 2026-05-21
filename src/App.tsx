@@ -25,8 +25,7 @@ import { AddAgencyPage } from "./pages/AddAgencyPage";
 import { MessagesPage } from "./pages/MessagesPage";
 
 // ── Admin / Agency ────────────────────────────────────────────────────────────
-import { AdminPanel } from "./admin/AdminPanel";
-import { AgencyDashboard } from "./agency/AgencyDashboard";
+// AdminPanel and AgencyDashboard are now standalone apps on Vercel
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 import { Ic } from "./components/Icons";
@@ -69,8 +68,7 @@ export default function App() {
   const [authForm, setAuthForm] = useState({ username: "", password: "", phone: "", avatar: "https://i.pravatar.cc/80?img=1" });
   const [authError, setAuthError] = useState("");
   const [authSuccess, setAuthSuccess] = useState("");
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [showAgencyDash, setShowAgencyDash] = useState(false);
+  // Admin and Agency are now external Vercel apps
 
   // ── Data state ──
   const [reviews, setReviews] = useState<Review[]>(INIT_REVIEWS);
@@ -129,7 +127,7 @@ export default function App() {
     setAuthError("");
     if (authForm.username === ADMIN_USERNAME && authForm.password === ADMIN_PASSWORD) {
       setCurrentUser({ id: "admin", username: "admin", password: "", name: "Admin", phone: "0000000000", avatar: "https://i.pravatar.cc/80?img=3", provider: "manual" });
-      setShowAuth(false); setShowAdmin(true);
+      setShowAuth(false); window.open("https://admin-panel-mu-pied-47.vercel.app/", "_blank");
       return;
     }
     const { user, error } = loginUser(authForm.username, authForm.password);
@@ -194,7 +192,7 @@ export default function App() {
       currentUser={currentUser} unreadMsgs={unreadMsgs}
       onOpenAuth={() => setShowAuth(true)}
       onOpenProfile={() => {
-        if (currentUser?.username === ADMIN_USERNAME) setShowAdmin(true);
+        if (currentUser?.username === ADMIN_USERNAME) window.open("https://admin-panel-mu-pied-47.vercel.app/", "_blank");
         else setShowProfile(true);
       }}
       onOpenMsgs={() => goMsgs()}
@@ -315,15 +313,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Admin Panel */}
-      {showAdmin && (
-        <AdminPanel lang={lang} bookings={bookings} setBookings={setBookings} onClose={() => setShowAdmin(false)} />
-      )}
-
-      {/* Agency Dashboard */}
-      {showAgencyDash && currentUser && (
-        <AgencyDashboard lang={lang} currentUser={currentUser} bookings={bookings} setBookings={setBookings} onClose={() => setShowAgencyDash(false)} />
-      )}
+      {/* Admin Panel and Agency Dashboard are now standalone Vercel apps */}
 
       {/* Profile Modal */}
       {showProfile && currentUser && (
@@ -334,7 +324,7 @@ export default function App() {
             <h2 style={{ fontSize: 18, fontWeight: 800, color: "#fff", marginBottom: 5 }}>{currentUser.name}</h2>
             <p style={{ color: "rgba(255,255,255,.4)", fontSize: 13 }}>@{currentUser.username} · {currentUser.phone}</p>
             <div style={{ display: "flex", gap: 10, marginTop: 22, justifyContent: "center" }}>
-              <button onClick={() => { setShowProfile(false); setShowAgencyDash(true); }} style={{ background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.3)", color: "#C084FC", padding: "9px 18px", borderRadius: 9, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>
+              <button onClick={() => { setShowProfile(false); window.open("https://agency-portal-sigma.vercel.app/", "_blank"); }} style={{ background: "rgba(124,58,237,.12)", border: "1px solid rgba(124,58,237,.3)", color: "#C084FC", padding: "9px 18px", borderRadius: 9, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>
                 {lang === "ar" ? "لوحة الوكالة" : "Tableau de bord"}
               </button>
               <button onClick={() => { setCurrentUser(null); setShowProfile(false); }} style={{ background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "#F87171", padding: "9px 18px", borderRadius: 9, cursor: "pointer", fontSize: 13, fontWeight: 700 }}>
