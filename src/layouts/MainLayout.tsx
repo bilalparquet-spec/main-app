@@ -136,7 +136,7 @@ export function MainLayout({
       <main>{children}</main>
 
       {/* ── FLOATING MESSAGE BUTTON ── */}
-      <button className="fab-msg" onClick={onOpenMsgs} style={{ position: "fixed", bottom: 28, left: rtl ? 24 : "auto", right: rtl ? "auto" : 24, zIndex: 99, width: 50, height: 50, borderRadius: "50%", background: "linear-gradient(135deg,#7C3AED,#4F46E5)", border: "none", color: "#fff", cursor: "pointer", boxShadow: "0 4px 20px rgba(124,58,237,.5)", display: "flex", alignItems: "center", justifyContent: "center", position: "fixed" as any }}>
+      <button className="fab-msg" onClick={onOpenMsgs} style={{ position: "fixed", bottom: 28, left: rtl ? 24 : "auto", right: rtl ? "auto" : 24, zIndex: 99, width: 50, height: 50, borderRadius: "50%", background: "linear-gradient(135deg,#7C3AED,#4F46E5)", border: "none", color: "#fff", cursor: "pointer", boxShadow: "0 4px 20px rgba(124,58,237,.5)", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Ic.Msg />
         {unreadMsgs > 0 && (
           <span style={{ position: "absolute", top: -3, right: -3, width: 20, height: 20, borderRadius: "50%", background: "#EF4444", border: "2px solid #06060F", fontSize: 10, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", animation: "pulse 2s infinite" }}>
