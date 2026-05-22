@@ -1,3 +1,4 @@
+import { supabase } from "../lib/supabase";
 import { Conversation, ChatMessage } from "../data";
 
 type SetConvsFn = (fn: (p: Conversation[]) => Conversation[]) => void;
@@ -29,7 +30,9 @@ export const sendChatMessage = (
   attach: ChatMessage["attach"] | null,
   lang: string,
   setConvs: SetConvsFn,
-  setChatTyping: (v: boolean) => void
+  setChatTyping: (v: boolean) => void,
+  currentUserId?: string,
+  agencyId?: number
 ) => {
   const newMsg: ChatMessage = {
     id: Date.now(),
@@ -42,7 +45,6 @@ export const sendChatMessage = (
 
   setConvs(p => p.map(c => c.id === activeC ? { ...c, msgs: [...c.msgs, newMsg] } : c));
 
-  // Delivery tick
   const mid = newMsg.id!;
   setTimeout(() =>
     setConvs(p => p.map(c => c.id === activeC
@@ -51,7 +53,20 @@ export const sendChatMessage = (
     700
   );
 
-  // Agency typing + auto reply
+  // حفظ في Supabase
+  if (currentUserId && agencyId) {
+    const convDbId = `conv_${currentUserId}_ag${agencyId}`;
+    supabase.from("conversations").upsert({
+      id: convDbId, agency_id: agencyId, user_id: currentUserId, local_id: activeC
+    }).then(() =>
+      supabase.from("messages").insert({
+        conversation_id: convDbId, sender: "user",
+        text, user_id: currentUserId, agency_id: agencyId,
+      })
+    );
+  }
+
+  // Auto reply
   setTimeout(() => setChatTyping(true), 800);
   setTimeout(() => {
     setChatTyping(false);

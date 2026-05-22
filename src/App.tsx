@@ -145,9 +145,9 @@ export default function App() {
     setShowAuth(false);
   };
 
-  const doRegister = () => {
+  const doRegister = async () => {
     setAuthError(""); setAuthSuccess("");
-    const { success, error } = registerUser(authForm.username, authForm.password, authForm.phone, authForm.avatar);
+    const { success, error } = await registerUser(authForm.username, authForm.password, authForm.phone, authForm.avatar);
     if (error) {
       const errMap: Record<string, Record<Lang, string>> = {
         errUsername:     { ar: "اسم المستخدم يجب أن يكون 3 أحرف على الأقل", fr: "Nom d'utilisateur trop court", en: "Username too short" },
