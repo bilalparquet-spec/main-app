@@ -60,8 +60,8 @@ export function AgencyRegisterPage({ onBack }) {
   const passMatch = !form.confirm || form.password === form.confirm;
 
   function canNext() {
-    if (step === 0) return form.name && form.owner && form.phone;
-    if (step === 1) return form.wilaya && form.address && form.email;
+    if (step === 0) return form.name && form.owner && form.phone && form.email;
+    if (step === 1) return form.wilaya && form.address;
     if (step === 2) return form.username && form.password && form.confirm && passMatch && form.password.length >= 6;
     if (step === 3) return form.agree;
     return true;
