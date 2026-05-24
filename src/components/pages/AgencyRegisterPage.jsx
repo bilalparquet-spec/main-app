@@ -90,7 +90,7 @@ export function AgencyRegisterPage({ onBack }) {
           تم إرسال طلبك!
         </h1>
         <p style={{fontSize:"clamp(13px,3.2vw,15px)",color:"rgba(255,255,255,.45)",textAlign:"center",lineHeight:1.8,marginBottom:10,maxWidth:340}}>
-          سيتم مراجعة بيانات وكالتك من قِبل فريقنا خلال 24-48 ساعة وستصلك رسالة تأكيد على بريدك الإلكتروني
+          ستتلقى اتصال من قِبل فريقنا خلال 24 ساعة 
         </p>
         <div style={{background:"rgba(52,211,153,.1)",border:"1px solid rgba(52,211,153,.25)",borderRadius:14,padding:"12px 20px",marginBottom:32,textAlign:"center"}}>
           <span style={{fontSize:"clamp(12px,3vw,14px)",color:"#34D399",fontWeight:700}}>{form.email}</span>
