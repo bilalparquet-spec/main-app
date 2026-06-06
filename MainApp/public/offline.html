@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <title>درايف RENT - بدون اتصال</title>
+  <meta name="theme-color" content="#07080F"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#07080F;color:#F1F5F9;font-family:'Cairo',system-ui,sans-serif;
+      min-height:100dvh;display:flex;align-items:center;justify-content:center;
+      padding:24px;text-align:center;}
+    .card{max-width:340px;width:100%;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:28px;padding:32px 24px;
+      box-shadow:0 32px 80px rgba(0,0,0,.5);}
+    .icon-wrap{position:relative;display:inline-block;margin-bottom:24px;}
+    .icon-wrap img{width:80px;height:80px;border-radius:20px;object-fit:cover;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 12px 40px rgba(124,58,237,.2);}
+    .badge{position:absolute;bottom:-5px;right:-5px;
+      width:26px;height:26px;border-radius:50%;
+      background:#F59E0B;border:2px solid #07080F;
+      display:flex;align-items:center;justify-content:center;
+      font-size:13px;font-weight:900;}
+    h1{font-size:22px;font-weight:900;margin-bottom:10px;
+      background:linear-gradient(135deg,#fff,#A78BFA);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    p{color:rgba(255,255,255,.5);font-size:14px;line-height:1.75;margin-bottom:28px;}
+    .highlight{color:rgba(167,139,250,.85);font-weight:600;}
+
+    .tips{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;text-align:right;}
+    .tip{display:flex;align-items:center;gap:10px;
+      background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+      border-radius:12px;padding:12px 14px;font-size:13px;color:rgba(255,255,255,.55);}
+    .tip svg{flex-shrink:0;opacity:.6;}
+
+    .actions{display:flex;flex-direction:column;gap:10px;}
+    .btn-primary{border:none;border-radius:14px;
+      background:linear-gradient(135deg,#7C3AED,#6D28D9);
+      color:#fff;font-family:inherit;font-weight:700;font-size:15px;
+      padding:14px 20px;cursor:pointer;
+      box-shadow:0 8px 24px rgba(124,58,237,.3);
+      transition:transform .15s,filter .15s;}
+    .btn-primary:active{transform:scale(.97);}
+    .btn-secondary{border:1px solid rgba(255,255,255,.1);border-radius:14px;
+      background:rgba(255,255,255,.05);
+      color:rgba(255,255,255,.65);font-family:inherit;font-weight:600;font-size:14px;
+      padding:13px 20px;cursor:pointer;transition:background .15s;}
+    .btn-secondary:active{background:rgba(255,255,255,.09);}
+
+    .status{margin-top:20px;font-size:12px;color:rgba(255,255,255,.25);}
+    .dot{display:inline-block;width:7px;height:7px;border-radius:50%;
+      background:#EF4444;margin-left:6px;vertical-align:middle;
+      animation:blink 1.4s ease infinite;}
+    @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .card{animation:fadeUp .4s ease both}
+  </style>
+</head>
+<body>
+  <main class="card">
+
+    <!-- أيقونة مع شارة تحذير -->
+    <div class="icon-wrap">
+      <img src="/icon-192x192.png" alt="درايف Rent"/>
+      <div class="badge">📶</div>
+    </div>
+
+    <h1>أنت بدون اتصال</h1>
+    <p>
+      لا يوجد اتصال بالإنترنت حالياً.<br/>
+      <span class="highlight">يمكنك تصفّح السيارات المحفوظة</span> من آخر زيارة.
+    </p>
+
+    <!-- ما يعمل offline -->
+    <div class="tips">
+      <div class="tip">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13 5L6.5 11.5L3 8" stroke="#A78BFA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        تصفّح السيارات والوكالات المحفوظة
+      </div>
+      <div class="tip">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M13 5L6.5 11.5L3 8" stroke="#A78BFA" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        عرض تفاصيل السيارات التي زرتها
+      </div>
+      <div class="tip">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 3v5l3 3" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        الحجز يحتاج اتصالاً بالإنترنت
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" onclick="tryReload()">
+        إعادة المحاولة
+      </button>
+      <button class="btn-secondary" onclick="goToApp()">
+        تصفّح المحفوظ
+      </button>
+    </div>
+
+    <div class="status">
+      <span class="dot"></span>
+      بدون اتصال — <span id="time"></span>
+    </div>
+  </main>
+
+  <script>
+    // وقت انقطاع الاتصال
+    document.getElementById('time').textContent = new Date().toLocaleTimeString('ar-DZ');
+
+    // إعادة المحاولة مع reload
+    function tryReload() {
+      if (navigator.onLine) {
+        location.href = '/';
+      } else {
+        location.reload();
+      }
+    }
+
+    // الذهاب للتطبيق (سيُعرض من الكاش)
+    function goToApp() {
+      location.href = '/';
+    }
+
+    // عند عودة الاتصال → redirect تلقائي
+    window.addEventListener('online', () => {
+      setTimeout(() => { location.href = '/'; }, 800);
+    });
+  </script>
+</body>
+</html>
